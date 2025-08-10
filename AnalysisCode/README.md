@@ -102,7 +102,7 @@ cd AnalysisCode/PerceivedRiskPrediction/ModelCalibration_Training/DNN_Training/s
 # quick smoke tests (2 epochs) — pick a unified experiment tag, e.g. 2025
 python train_MB.py --num_epochs 2 --experiment_index 2025
 python train_HB.py --num_epochs 2 --experiment_index 2025
-python train_AMB.py --num_epochs 2 --experiment_index 2025   # AMB == SVM in older naming
+python train_SVM.py --num_epochs 2 --experiment_index 2025  
 ```
 
 ### 3.2 Evaluate
