@@ -30,25 +30,26 @@ import argparse
 parser = argparse.ArgumentParser(description='Train a neural network.')
 parser.add_argument('--num_epochs', type=int, default=500,
                     help='Number of epochs for training.')
-parser.add_argument('--experiment_index', type=str, default='202404-complete_data',
+parser.add_argument('--experiment_index', type=str, default='2025',
                         help='Index of the experiment.')
 args = parser.parse_args()
 num_epochs = args.num_epochs
 index = args.experiment_index
 
 # np.random.seed(0)
-# data = np.load('./data/MB_feature_reg_aug.npy')
-data_right = np.load('./data/MB_feature_reg.npy')
-data_left  = np.load('./data/MB_feature_reg_aug.npy')
-data =  np.concatenate((data_right, data_left), axis=0)
+data = np.load('./data/MB_feature_reg_aug.npy')
+# data_right = np.load('./data/MB_feature_reg.npy')
+# data_left  = np.load('./data/MB_feature_reg_aug.npy')
+# data =  np.concatenate((data_right, data_left), axis=0)
 
 
 model_name = 'MB'
+exp_tag = model_name if (not index or index.lower() == model_name.lower()) else f"{model_name}_{index}"
 print(model_name)
 event_len = 301
 
-# event_nb = 27
-event_nb = 54
+event_nb = 27
+# event_nb = 54
 
 print(model_name)
 relative_path_fig = './figures'

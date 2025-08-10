@@ -32,7 +32,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Train a neural network.')
 parser.add_argument('--num_epochs', type=int, default=300,
                     help='Number of epochs for training.')
-parser.add_argument('--experiment_index', type=str, default='1',
+parser.add_argument('--experiment_index', type=str, default='2025',
                         help='Index of the experiment.')
 args = parser.parse_args()
 num_epochs = args.num_epochs
