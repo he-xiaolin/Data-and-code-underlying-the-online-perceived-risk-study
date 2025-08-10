@@ -114,6 +114,6 @@ for ind, File_name in enumerate(Input_File_name_list):  # event files   1-27
 feature_len = comb_temp.shape[-1]
 print('LC_feature Type:',type(LC_feature_reg))
 LC_feature_reg = np.array(LC_feature_reg).reshape(-1,feature_len)
-np.save('../data/LC_feature_reg_2.npy',LC_feature_reg)
+np.save('../data/LC_2_feature_reg.npy',LC_feature_reg)
 
 

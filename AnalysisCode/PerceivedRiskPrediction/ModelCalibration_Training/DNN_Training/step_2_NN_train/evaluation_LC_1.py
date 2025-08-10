@@ -34,7 +34,7 @@ parser.add_argument('--experiment_index', type=str, default='2025',
                         help='Index of the experiment.')
 args = parser.parse_args()
 index = args.experiment_index
-data = np.load('./data/LC_feature_reg_1.npy')
+data = np.load('./data/LC_1_feature_reg.npy')
 model_name = 'LC_1'
 print('Evaluating',model_name)
 event_len = 361

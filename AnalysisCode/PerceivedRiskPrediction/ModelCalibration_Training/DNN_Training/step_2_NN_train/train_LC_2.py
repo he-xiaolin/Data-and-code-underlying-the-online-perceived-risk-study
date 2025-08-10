@@ -40,7 +40,7 @@ index = args.experiment_index
 
 
 # np.random.seed(0)
-data = np.load('./data/LC_feature_reg_2.npy')
+data = np.load('./data/LC_2_feature_reg.npy')
 model_name = 'LC_2'
 event_len = 361
 event_nb = 6
