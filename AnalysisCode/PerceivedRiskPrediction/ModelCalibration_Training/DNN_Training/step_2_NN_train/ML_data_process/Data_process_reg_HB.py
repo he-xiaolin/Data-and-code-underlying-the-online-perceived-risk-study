@@ -3,8 +3,8 @@ import numpy as np
 import os
 
 
-Input_Dic_name = '../../3-Feature_extraction/processed_feature_v4/HB/regression_input/'
-Label_Dic_name = '../../3-Feature_extraction/processed_feature_v4/HB/regression_label/'
+Input_Dic_name = '../../step_1_Feature_extraction/processed_feature/HB/regression_input/'
+Label_Dic_name = '../../step_1_Feature_extraction/processed_feature/HB/regression_label/'
 
 Input_File_name_list = os.listdir(Input_Dic_name)
 Input_File_name_list.sort()

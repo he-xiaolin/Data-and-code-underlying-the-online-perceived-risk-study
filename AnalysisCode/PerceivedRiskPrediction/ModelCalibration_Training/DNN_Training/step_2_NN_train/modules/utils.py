@@ -13,21 +13,21 @@ def create_directory_with_timestamp(relative_path,index):
    
     # Create the path under ./figures
     dir_path = os.path.join(relative_path, index)
-    dir_path_AMB = os.path.join(dir_path, 'AMB')
+    dir_path_SVM = os.path.join(dir_path, 'SVM')
     dir_path_HB  = os.path.join(dir_path, 'HB')
-    dir_path_MAL_1 = os.path.join(dir_path, 'MAL_1')
-    dir_path_MAL_2 = os.path.join(dir_path, 'MAL_2')
-    dir_path_MAL_3 = os.path.join(dir_path, 'MAL_3')
+    dir_path_LC_1 = os.path.join(dir_path, 'LC_1')
+    dir_path_LC_2 = os.path.join(dir_path, 'LC_2')
+    dir_path_LC_3 = os.path.join(dir_path, 'LC_3')
     dir_path_MB  = os.path.join(dir_path, 'MB')
 
     # Make the directory if it doesn't exist
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
-        os.makedirs(dir_path_AMB)
+        os.makedirs(dir_path_SVM)
         os.makedirs(dir_path_HB)
-        os.makedirs(dir_path_MAL_1)
-        os.makedirs(dir_path_MAL_2)
-        os.makedirs(dir_path_MAL_3)
+        os.makedirs(dir_path_LC_1)
+        os.makedirs(dir_path_LC_2)
+        os.makedirs(dir_path_LC_3)
         os.makedirs(dir_path_MB)
     return dir_path  # Return the full path of the directory
 

@@ -30,7 +30,7 @@ from modules.evaluating_function import eval
 
 parser = argparse.ArgumentParser(description='Train a neural network.')
 
-parser.add_argument('--experiment_index', type=str, default='20231219_2222',
+parser.add_argument('--experiment_index', type=str, default='2025',
                         help='Index of the experiment.')
 args = parser.parse_args()
 index = args.experiment_index

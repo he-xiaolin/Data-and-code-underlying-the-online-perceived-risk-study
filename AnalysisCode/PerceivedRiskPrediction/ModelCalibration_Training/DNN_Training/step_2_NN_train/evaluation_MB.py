@@ -30,7 +30,7 @@ from modules.evaluating_function import eval
 
 parser = argparse.ArgumentParser(description='Train a neural network.')
 
-parser.add_argument('--experiment_index', type=str,  default='202404-complete_data',
+parser.add_argument('--experiment_index', type=str,  default='2025',
                         help='Index of the experiment.')
 args = parser.parse_args()
 index = args.experiment_index
@@ -43,8 +43,8 @@ data =  np.concatenate((data_right, data_left), axis=0)
 model_name = 'MB'
 print('Evaluating',model_name)
 event_len = 301
-# event_nb = 27
-event_nb = 54
+event_nb = 27
+# event_nb = 54
 path_train_index = os.path.join('./models', index, model_name,'train_index.npy')
 train_index = np.load(path_train_index)
 path_test_index = os.path.join('./models', index, model_name,'test_index.npy')
