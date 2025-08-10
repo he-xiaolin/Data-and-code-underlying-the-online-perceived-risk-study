@@ -1,8 +1,8 @@
-# Explanations for files for statistical analysis in Table 1
+# Explanations for files for statistical analysis in Table S2
 This folder contains necessary MATLAB scripts to reorganise the data for SPSS, `.sav` data files for SPSS analysis and `.spv` results files generated in the linear mixed model analysis. The folder structure is as follows. 
 
 ```
-Table1/
+TableS2/
 ├── DataProcessScriptsForSPSS/
       ├── HB_data_extraction.m
       ├── LC_data_extraction.m
@@ -25,7 +25,7 @@ Table1/
          ├── MB_LMM.spv
          └── SVM_LMM.spv
 ```
-## [Table1/](./)
+## [TableS2/](./)
 ### [./DataProcessScriptsForSPSS/](./DataProcessScriptsForSPSS/)
 This folder contains four files `MB_data_extraction.m`, `HB_data_extraction.m`, `LC_data_extraction.m`, and `SVM_data_extraction.m` to reorganise the data to the format that is suitable for a linear mixed model analysis in SPSS. These scripts generates data files `reorganised_MB_data_extraction.csv`, `reorganised_HB_data_extraction.csv`,  `reorganised_LC_data_extraction.csv` and `reorganised_SVM_data_extraction.csv`, which can be imported into SPSS for further analysis. `eta-squared calculation.xlsx` calculates the eta-squared for each of the variables. 
 
