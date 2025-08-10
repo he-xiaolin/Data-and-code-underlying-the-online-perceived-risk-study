@@ -30,7 +30,7 @@ def generate_prediction(input):
     return arr
 
 
-def shap_cal(model_name, data, K, event_id, event_duration, event_numb, feature_names):
+def shap_cal(model_name, data, K, event_id, event_duration, event_numb, feature_names, per_event=False):
     in_dim = data.shape[1] - 1   # input dimension
     x_all, y_all =  data[:, :in_dim], data[:, in_dim:]
     x_all_means, x_all_stds = x_all.mean(axis = 0), x_all.var(axis = 0)**0.5
@@ -70,77 +70,79 @@ def shap_cal(model_name, data, K, event_id, event_duration, event_numb, feature_
 
     shap.initjs()
 
-    # ----- Local dynamics for the selected event -----
-    start = (event_id - 1) * event_duration
-    end = start + event_duration
-    event_samples = x_all[start:end]  # (T, n_features)
+    # ----- Local dynamics: one event (event_id) or all events if per_event -----
+    event_ids = range(1, event_numb + 1) if per_event else [event_id]
+    for e_id in event_ids:
+        start = (e_id - 1) * event_duration
+        end = start + event_duration
+        event_samples = x_all[start:end]  # (T, n_features)
 
-    # Compute SHAP values for this event
-    shap_values_event = explainer.shap_values(event_samples)
-    sv_event = shap_values_event[0] if isinstance(shap_values_event, list) else shap_values_event
-    sv_event = np.asarray(sv_event)
-    # reduce any extra output dims until (T, n_features)
-    while sv_event.ndim > 2:
-        sv_event = sv_event[..., 0]
-    if sv_event.ndim == 1:
-        sv_event = sv_event.reshape(-1, 1)
+        # Compute SHAP values for this event
+        shap_values_event = explainer.shap_values(event_samples)
+        sv_event = shap_values_event[0] if isinstance(shap_values_event, list) else shap_values_event
+        sv_event = np.asarray(sv_event)
+        # reduce any extra output dims until (T, n_features)
+        while sv_event.ndim > 2:
+            sv_event = sv_event[..., 0]
+        if sv_event.ndim == 1:
+            sv_event = sv_event.reshape(-1, 1)
 
-    # 1) Heatmap over time (prefer SHAP heatmap, fallback to matplotlib)
-    try:
-        expl_event = shap.Explanation(
-            values=sv_event,
+        # 1) Heatmap over time (prefer SHAP heatmap, fallback to matplotlib)
+        try:
+            expl_event = shap.Explanation(
+                values=sv_event,
+                base_values=float(np.atleast_1d(explainer.expected_value)[0]),
+                data=event_samples,
+                feature_names=feature_names
+            )
+            plt.figure(figsize=(8, 4))
+            shap.plots.heatmap(
+                expl_event,
+                instance_order=np.arange(len(event_samples)),
+                max_display=20,
+                show=False
+            )
+            plt.savefig(f"{model_name}/shap_ts_heatmap_event{e_id}.pdf", dpi=600, bbox_inches='tight')
+            plt.close()
+        except Exception:
+            imp_evt = np.mean(np.abs(sv_event), axis=0)
+            order_evt = np.argsort(imp_evt)[::-1][:20]
+            plt.figure(figsize=(8, 4))
+            plt.imshow(sv_event[:, order_evt].T, aspect='auto', cmap='coolwarm', interpolation='nearest')
+            plt.yticks(range(len(order_evt)), [feature_names[i] for i in order_evt])
+            plt.xlabel("time index")
+            plt.colorbar(label="SHAP value")
+            plt.tight_layout()
+            plt.savefig(f"{model_name}/shap_ts_heatmap_event{e_id}.pdf", dpi=600, bbox_inches='tight')
+            plt.close()
+
+        # 2) Time-series of Top-k features' SHAP
+        topk = 6
+        order2 = np.argsort(np.mean(np.abs(sv_event), axis=0))[::-1][:topk]
+        plt.figure(figsize=(7, 3))
+        for i in order2:
+            plt.plot(sv_event[:, i], label=feature_names[i])
+        plt.legend(loc="upper right", ncol=2, fontsize=7)
+        plt.xlabel("time index"); plt.ylabel("SHAP")
+        plt.tight_layout()
+        plt.savefig(f"{model_name}/shap_lines_event{e_id}.pdf", dpi=600, bbox_inches='tight')
+        plt.close()
+
+        # 3) Local explanation at a single time step (waterfall)
+        t = len(event_samples) // 2
+        single = event_samples[t:t+1]
+        sv_t = explainer.shap_values(single)
+        sv_t = sv_t[0] if isinstance(sv_t, list) else sv_t
+        sv_t = np.asarray(sv_t).reshape(1, -1)
+        expl_t = shap.Explanation(
+            values=sv_t,
             base_values=float(np.atleast_1d(explainer.expected_value)[0]),
-            data=event_samples,
+            data=single,
             feature_names=feature_names
         )
-        plt.figure(figsize=(8, 4))
-        shap.plots.heatmap(
-            expl_event,
-            instance_order=np.arange(len(event_samples)),
-            max_display=20,
-            show=False
-        )
-        plt.savefig(f"{model_name}/shap_ts_heatmap_event{event_id}.pdf", dpi=600, bbox_inches='tight')
+        shap.plots.waterfall(expl_t[0], show=False)
+        plt.savefig(f"{model_name}/shap_waterfall_event{e_id}_t{t}.pdf", dpi=600, bbox_inches='tight')
         plt.close()
-    except Exception:
-        imp_evt = np.mean(np.abs(sv_event), axis=0)
-        order_evt = np.argsort(imp_evt)[::-1][:20]
-        plt.figure(figsize=(8, 4))
-        plt.imshow(sv_event[:, order_evt].T, aspect='auto', cmap='coolwarm', interpolation='nearest')
-        plt.yticks(range(len(order_evt)), [feature_names[i] for i in order_evt])
-        plt.xlabel("time index")
-        plt.colorbar(label="SHAP value")
-        plt.tight_layout()
-        plt.savefig(f"{model_name}/shap_ts_heatmap_event{event_id}.pdf", dpi=600, bbox_inches='tight')
-        plt.close()
-
-    # 2) Time-series of Top-k features' SHAP
-    topk = 6
-    order2 = np.argsort(np.mean(np.abs(sv_event), axis=0))[::-1][:topk]
-    plt.figure(figsize=(7, 3))
-    for i in order2:
-        plt.plot(sv_event[:, i], label=feature_names[i])
-    plt.legend(loc="upper right", ncol=2, fontsize=7)
-    plt.xlabel("time index"); plt.ylabel("SHAP")
-    plt.tight_layout()
-    plt.savefig(f"{model_name}/shap_lines_event{event_id}.pdf", dpi=600, bbox_inches='tight')
-    plt.close()
-
-    # 3) Local explanation at a single time step (waterfall)
-    t = len(event_samples) // 2
-    single = event_samples[t:t+1]
-    sv_t = explainer.shap_values(single)
-    sv_t = sv_t[0] if isinstance(sv_t, list) else sv_t
-    sv_t = np.asarray(sv_t).reshape(1, -1)
-    expl_t = shap.Explanation(
-        values=sv_t,
-        base_values=float(np.atleast_1d(explainer.expected_value)[0]),
-        data=single,
-        feature_names=feature_names
-    )
-    shap.plots.waterfall(expl_t[0], show=False)
-    plt.savefig(f"{model_name}/shap_waterfall_event{event_id}_t{t}.pdf", dpi=600, bbox_inches='tight')
-    plt.close()
 
 
 # #  selected events results
@@ -240,6 +242,8 @@ parser = argparse.ArgumentParser(description='SHAP for trained MC-Dropout model'
 parser.add_argument('--scenario', type=str, default='SVM', choices=['HB','MB','SVM','LC_1','LC_2','LC_3'])
 parser.add_argument('--experiment_index', type=str, default='2025')
 parser.add_argument('--K', type=int, default=1500)
+parser.add_argument('--event_id', type=int, default=1, help='1-based event id for local plots')
+parser.add_argument('--per_event', action='store_true', help='Compute local SHAP for all events (1..event_numb)')
 args = parser.parse_args()
 
 SCN = args.scenario
@@ -249,7 +253,7 @@ path_data = f"../step_2_NN_train/data/{SCN}_feature_reg.npy"
 data = np.load(path_data)
 
 K = args.K  # background sample size for SHAP
-event_id = 1
+event_id = args.event_id
 event_duration = 301
 event_numb = 27
 
@@ -302,4 +306,5 @@ shap_values = shap_cal(model_name = model_name,
                        event_id = event_id,
                        event_duration = event_duration,
                        event_numb = event_numb,
-                       feature_names = feature_names)
+                       feature_names = feature_names,
+                       per_event = args.per_event)
