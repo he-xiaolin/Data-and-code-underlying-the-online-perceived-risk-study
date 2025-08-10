@@ -9,7 +9,7 @@ import torch
 import shap
 import argparse
 import sys
-sys.path.append("../step_2_NN_train/")
+sys.path.append("../PerceivedRiskPrediction/ModelCalibration_Training/DNN_Training/step_2_NN_train/")
 from modules.MC_Dropout_Model import MC_Dropout_Model
 from modules.utils import *  # noqa: F401,F403
 from modules.MC_Dropout_Wrapper import MC_Dropout_Wrapper  # noqa: F401
@@ -222,7 +222,7 @@ SCN = args.scenario
 model_name = SCN
 
 # data & model paths (aligned to step_2_NN_train)
-path_data = f"../step_2_NN_train/data/{SCN}_feature_reg.npy"
+path_data = f"../PerceivedRiskPrediction/ModelCalibration_Training/DNN_Training/step_2_NN_train/data/{SCN}_feature_reg.npy"
 data = np.load(path_data)
 
 K = args.K  # background sample size for SHAP
@@ -231,7 +231,7 @@ event_id = args.event_id
 event_duration = 301
 event_numb = 27
 
-path_best_weight = f"../step_2_NN_train/models/{args.experiment_index}/{SCN}/best_model_{SCN}.pth"
+path_best_weight = f"../PerceivedRiskPrediction/ModelCalibration_Training/DNN_Training/step_2_NN_train/models/{args.experiment_index}/{SCN}/best_model_{SCN}.pth"
 best_model = MC_Dropout_Model(input_dim=data.shape[1] - 1, output_dim=1, num_units=500, drop_prob=0.1)
 try:
     state = torch.load(path_best_weight, map_location='cpu', weights_only=True)
